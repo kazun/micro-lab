@@ -10,6 +10,7 @@ resources:
   - voting-hpa.yaml
   - review-hpa.yaml
   - gateway-hpa.yaml
+  - analytics-hpa.yaml
 
 patches:
   - path: identity-deployment-patch.yaml
@@ -17,5 +18,6 @@ patches:
   - path: voting-deployment-patch.yaml
   - path: review-deployment-patch.yaml
   - path: gateway-deployment-patch.yaml
+  - path: analytics-deployment-patch.yaml
   - path: secret-patch.yaml
   - path: postgres-patch.yaml

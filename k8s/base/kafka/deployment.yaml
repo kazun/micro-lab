@@ -39,6 +39,15 @@ spec:
               value: 1@kafka:9093
             - name: KAFKA_INTER_BROKER_LISTENER_NAME
               value: PLAINTEXT
+            # Single-broker cluster: internal topics default to replication
+            # factor 3, which can never satisfy with only 1 broker and
+            # silently blocks all consumer group coordination.
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+              value: "1"
           resources:
             requests:
               cpu: 250m

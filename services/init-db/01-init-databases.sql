@@ -3,3 +3,4 @@
 CREATE DATABASE product_db OWNER appuser;
 CREATE DATABASE voting_db OWNER appuser;
 CREATE DATABASE review_db OWNER appuser;
+CREATE DATABASE analytics_db OWNER appuser;

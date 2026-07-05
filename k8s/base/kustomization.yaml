@@ -10,3 +10,4 @@ resources:
   - product-service
   - voting-service
   - review-service
+  - analytics-service

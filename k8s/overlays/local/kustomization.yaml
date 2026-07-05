@@ -12,4 +12,5 @@ patches:
   - path: voting-deployment-patch.yaml
   - path: review-deployment-patch.yaml
   - path: gateway-deployment-patch.yaml
+  - path: analytics-deployment-patch.yaml
   - path: secret-patch.yaml
