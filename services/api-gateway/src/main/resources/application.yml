@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: identity-service
+          uri: ${IDENTITY_SERVICE_URI:http://identity-service:8080}
+          predicates:
+            - Path=/api/v1/users/**,/api/v1/auth/**
+        - id: product-service
+          uri: ${PRODUCT_SERVICE_URI:http://product-service:8080}
+          predicates:
+            - Path=/api/v1/entities/**
+        - id: voting-service
+          uri: ${VOTING_SERVICE_URI:http://voting-service:8080}
+          predicates:
+            - Path=/api/v1/votes/**
+        - id: review-service
+          uri: ${REVIEW_SERVICE_URI:http://review-service:8080}
+          predicates:
+            - Path=/api/v1/reviews/**
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    readinessstate:
+      enabled: true
+    livenessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
