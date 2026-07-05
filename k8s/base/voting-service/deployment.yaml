@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voting-service
+  labels:
+    app: voting-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: voting-service
+  template:
+    metadata:
+      labels:
+        app: voting-service
+    spec:
+      containers:
+        - name: voting-service
+          image: peap/voting-service:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: voting-service-config
+            - secretRef:
+                name: peap-db-secret
+          resources:
+            requests:
+              cpu: 250m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15

@@ -4,6 +4,9 @@ import com.peap.product.model.PublicEntity;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * @author kazun
+ */
 public record EntityResponse(
         UUID id, String name, String category, String description, String status, Instant createdAt) {
 

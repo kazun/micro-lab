@@ -4,6 +4,9 @@ import com.peap.voting.model.Vote;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author kazun
+ */
 @Component
 public class VoteEventPublisher {
 

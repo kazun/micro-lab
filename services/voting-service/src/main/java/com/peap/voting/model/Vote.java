@@ -11,6 +11,7 @@ import java.util.UUID;
 /**
  * One row per (entityId, userId) pair - enforces the AID rule "one user vote
  * per entity version" (section 6.4). Re-votes update the existing row.
+ * @author kazun
  */
 @Entity
 @Table(name = "votes", uniqueConstraints = @UniqueConstraint(columnNames = {"entity_id", "user_id"}))

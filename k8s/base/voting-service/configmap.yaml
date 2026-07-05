@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: voting-service-config
+data:
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/voting_db"
+  SPRING_DATASOURCE_USERNAME: "appuser"
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  SPRING_REDIS_HOST: "redis"
+  SPRING_REDIS_PORT: "6379"

@@ -3,6 +3,9 @@ package com.peap.identity.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+/**
+ * @author kazun
+ */
 public record LoginRequest(
 
         @NotBlank @Email String email,

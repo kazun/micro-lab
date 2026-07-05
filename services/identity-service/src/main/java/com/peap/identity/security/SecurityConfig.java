@@ -11,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 /**
  * The API gateway is the RBAC enforcement point; this service only needs to
  * accept its own registration/login endpoints and expose actuator probes.
+ * @author kazun
  */
 @Configuration
 public class SecurityConfig {

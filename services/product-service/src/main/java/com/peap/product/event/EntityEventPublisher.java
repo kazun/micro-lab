@@ -4,6 +4,9 @@ import com.peap.product.model.PublicEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author kazun
+ */
 @Component
 public class EntityEventPublisher {
 

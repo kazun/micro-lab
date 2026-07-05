@@ -12,6 +12,7 @@ import java.util.UUID;
 /**
  * A rateable public entity: a product, restaurant, government service, political
  * party, or any other category listed in the AID's target domains (section 4).
+ * @author kazun
  */
 @Entity
 @Table(name = "public_entities")

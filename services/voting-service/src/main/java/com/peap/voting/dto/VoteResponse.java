@@ -4,6 +4,9 @@ import com.peap.voting.model.Vote;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * @author kazun
+ */
 public record VoteResponse(UUID id, UUID entityId, UUID userId, int value, Instant updatedAt) {
 
     public static VoteResponse from(Vote vote) {

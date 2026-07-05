@@ -4,6 +4,9 @@ import com.peap.identity.model.User;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * @author kazun
+ */
 public record UserResponse(UUID id, String email, String role, Instant createdAt) {
 
     public static UserResponse from(User user) {

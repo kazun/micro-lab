@@ -14,6 +14,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
  * Entity scores are read far more often than votes change, so cache the
  * aggregate for a short TTL instead of recomputing an AVG() on every request.
  * Values are JSON-serialized since ScoreResponse is a record, not Serializable.
+ * @author kazun
  */
 @Configuration
 @EnableCaching

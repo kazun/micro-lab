@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 /**
  * Minimal HMAC-signed JWT issuer for the MVP. Token validation/refresh and the
  * gateway-side filter chain are follow-up work once RBAC rules are finalized.
+ * @author kazun
  */
 @Service
 public class JwtService {

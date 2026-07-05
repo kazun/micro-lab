@@ -9,6 +9,9 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * @author kazun
+ */
 @Entity
 @Table(name = "users", uniqueConstraints = @jakarta.persistence.UniqueConstraint(columnNames = "email"))
 public class User {
