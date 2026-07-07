@@ -1,0 +1,34 @@
+# Static PV bound to the pre-created disk `peap-qa-postgres` so QA's
+# Postgres data survives cluster delete/create cycles. The disk was made
+# once with:
+#   gcloud compute disks create peap-qa-postgres --size=10GB --type=pd-balanced --zone=us-central1-a
+# Reclaim policy Retain means deleting the PVC (or the whole cluster)
+# never deletes the disk. Do NOT delete this disk during teardown.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: peap-qa-postgres-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  # Only postgres-pvc in peap-qa may bind this volume.
+  claimRef:
+    namespace: peap-qa
+    name: postgres-pvc
+  csi:
+    driver: pd.csi.storage.gke.io
+    volumeHandle: projects/peap-lab/zones/us-central1-a/disks/peap-qa-postgres
+    fsType: ext4
+  # Zonal disk: the postgres pod must land on a node in the same zone.
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: topology.gke.io/zone
+              operator: In
+              values:
+                - us-central1-a

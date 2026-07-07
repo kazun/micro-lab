@@ -5,6 +5,7 @@ namespace: peap-qa
 resources:
   - ../../base
   - namespace.yaml
+  - postgres-pv.yaml
 
 patches:
   - path: identity-deployment-patch.yaml
