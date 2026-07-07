@@ -1,8 +1,14 @@
+# Bind statically to the pre-created peap-qa-postgres disk (see
+# postgres-pv.yaml) instead of dynamically provisioning a throwaway disk.
+# storageClassName must be the empty string to disable dynamic
+# provisioning; volumeName pins the claim to our PV.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
 spec:
+  storageClassName: ""
+  volumeName: peap-qa-postgres-pv
   resources:
     requests:
-      storage: 3Gi
+      storage: 10Gi
