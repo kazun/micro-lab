@@ -1,11 +1,9 @@
 name: Build and push images
 
+# Manual trigger only - run from the GitHub UI (Actions tab -> Build and
+# push images -> Run workflow) or: gh workflow run build-push.yaml
 on:
-  push:
-    branches: [main]
-    paths:
-      - "services/**"
-      - ".github/workflows/build-push.yaml"
+  workflow_dispatch:
 
 env:
   REGISTRY: us-central1-docker.pkg.dev/peap-lab/peap

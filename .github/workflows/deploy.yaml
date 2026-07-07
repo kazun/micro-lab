@@ -1,0 +1,83 @@
+name: Deploy to GKE (qa)
+
+# Manual trigger only. Deploys the requested image tag (default: latest)
+# to the qa overlay's namespace on the peap GKE cluster. The cluster is
+# created/deleted on demand to save credit, so this workflow expects it
+# to already exist - create it first with:
+#   gcloud container clusters create-auto peap --region us-central1
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Image tag to deploy (commit SHA or 'latest')"
+        required: true
+        default: latest
+
+env:
+  REGISTRY: us-central1-docker.pkg.dev/peap-lab/peap
+  CLUSTER: peap
+  REGION: us-central1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/596705075149/locations/global/workloadIdentityPools/github/providers/github-provider
+          service_account: github-actions@peap-lab.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          install_components: gke-gcloud-auth-plugin
+
+      - name: Check cluster exists
+        run: |
+          if ! gcloud container clusters describe "$CLUSTER" --region "$REGION" --format="value(status)"; then
+            echo "::error::Cluster '$CLUSTER' not found in $REGION. Create it first:"
+            echo "::error::  gcloud container clusters create-auto $CLUSTER --region $REGION"
+            exit 1
+          fi
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: peap
+          location: us-central1
+
+      - name: Set image tags to ${{ inputs.tag }}
+        working-directory: k8s/overlays/qa
+        run: |
+          which kustomize || {
+            curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+            sudo mv kustomize /usr/local/bin/
+          }
+          for svc in api-gateway identity-service product-service voting-service review-service analytics-service; do
+            kustomize edit set image "${REGISTRY}/${svc}=${REGISTRY}/${svc}:${{ inputs.tag }}"
+          done
+
+      - name: Deploy
+        run: kubectl apply -k k8s/overlays/qa
+
+      - name: Wait for rollouts
+        run: |
+          for d in postgres redis kafka api-gateway identity-service product-service voting-service review-service analytics-service; do
+            kubectl -n peap-qa rollout status "deployment/$d" --timeout=300s
+          done
+
+      - name: Show gateway endpoint
+        run: |
+          echo "Waiting for LoadBalancer IP..."
+          for i in $(seq 1 30); do
+            IP=$(kubectl -n peap-qa get svc api-gateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+            [ -n "$IP" ] && break
+            sleep 10
+          done
+          echo "Gateway: http://${IP:-<pending>}"
