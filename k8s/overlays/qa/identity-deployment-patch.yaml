@@ -3,9 +3,19 @@ kind: Deployment
 metadata:
   name: identity-service
 spec:
-  replicas: 2
+  replicas: 1
   template:
     spec:
       containers:
         - name: identity-service
-          image: peap/identity-service:qa
+          image: us-central1-docker.pkg.dev/peap-lab/peap/identity-service:v1
+          # Tags get reused across rebuilds (e.g. the amd64 rebuild kept :v1),
+          # so never trust a node's cached copy.
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

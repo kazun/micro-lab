@@ -3,9 +3,17 @@ kind: Deployment
 metadata:
   name: voting-service
 spec:
-  replicas: 2
+  replicas: 1
   template:
     spec:
       containers:
         - name: voting-service
-          image: peap/voting-service:qa
+          image: us-central1-docker.pkg.dev/peap-lab/peap/voting-service:v1
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

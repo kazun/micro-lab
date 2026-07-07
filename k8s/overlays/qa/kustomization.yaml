@@ -13,5 +13,6 @@ patches:
   - path: review-deployment-patch.yaml
   - path: gateway-deployment-patch.yaml
   - path: analytics-deployment-patch.yaml
+  - path: gateway-service-patch.yaml
   - path: secret-patch.yaml
   - path: postgres-patch.yaml

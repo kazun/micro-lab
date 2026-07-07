@@ -35,8 +35,17 @@ spec:
               value: PLAINTEXT://kafka:9092
             - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
               value: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+            # Single replica acting as its own controller: self-registration
+            # must go over loopback, not the Service ClusterIP - kind's
+            # default CNI (kindnet) doesn't support a pod hairpinning back to
+            # itself through its own Service, so "1@kafka:9093" here fails
+            # with "Connection to node 1 could not be established" and the
+            # broker exits ("unable to register with the controller quorum").
+            # Other pods still reach the broker fine via the Service on 9092
+            # (KAFKA_ADVERTISED_LISTENERS) - only this self-referencing
+            # controller voter address needs to be localhost.
             - name: KAFKA_CONTROLLER_QUORUM_VOTERS
-              value: 1@kafka:9093
+              value: 1@localhost:9093
             - name: KAFKA_INTER_BROKER_LISTENER_NAME
               value: PLAINTEXT
             # Single-broker cluster: internal topics default to replication

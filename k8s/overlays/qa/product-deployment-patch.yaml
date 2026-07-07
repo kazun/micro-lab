@@ -3,9 +3,17 @@ kind: Deployment
 metadata:
   name: product-service
 spec:
-  replicas: 2
+  replicas: 1
   template:
     spec:
       containers:
         - name: product-service
-          image: peap/product-service:qa
+          image: us-central1-docker.pkg.dev/peap-lab/peap/product-service:v1
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
