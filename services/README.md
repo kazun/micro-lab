@@ -14,7 +14,8 @@ through Kafka.
 | `product-service` | 8080 (container) | `product_db` | `entity-created` |
 | `voting-service` | 8080 (container) | `voting_db` + Redis cache | `vote-submitted` |
 | `review-service` | 8080 (container) | `review_db` | `review-submitted` |
-| `analytics-service` | 8080 (container) | `analytics_db` | consumes all 4 topics above |
+| `analytics-service` | 8080 (container) | `analytics_db` | consumes the 4 domain topics + `api-request` |
+| `fraud-detection-job` | Flink UI 8081 (container) | Flink state + Redis blocklist | consumes `api-request`, publishes `fraud-detected` |
 
 Each service owns its own Postgres database — no service queries another's
 tables directly. Cross-service reads/writes go through the gateway or Kafka.
