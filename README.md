@@ -1,7 +1,7 @@
 # PEAP — Public Experience Analytics Platform (micro-lab)
 
 A learning lab implementing the MVP of the **Public Experience Analytics
-Platform** (see [Product Analysis & Initiation Document (AID).pdf](<Product Analysis & Initiation Document (AID).pdf>)):
+Platform** (see [Product Analysis & Initiation Document (AID).pdf](<documets/Product Analysis & Initiation Document (AID).pdf>)):
 a crowd-driven platform where users register, rate, and review public
 entities (products, restaurants, services), with real-time analytics and
 stream-based fraud detection.
@@ -168,8 +168,6 @@ yet enforced at the gateway. That's the next security milestone.
   or consumer groups silently never form (internal topic defaults to RF 3).
 - **Kafka on kind** needs the controller quorum voter at `localhost:9093`,
   not the Service name — kind's CNI can't hairpin a pod to itself.
-- **Apple Silicon images don't run on GKE**: build `linux/amd64` (CI does
-  this automatically; locally use `docker buildx build --platform linux/amd64`).
 - **Reused image tags need** `imagePullPolicy: Always`, or nodes serve a
   stale cached image.
 - **Flink on a fresh stack** retries until the gateway's first publish

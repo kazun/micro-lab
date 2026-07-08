@@ -86,9 +86,6 @@ curl localhost:8080/api/v1/analytics/leaderboard
 
 ## What's intentionally not here yet
 
-- **Fraud detection, notification, search services** — deferred per the
-  AID's MVP scope (section 13); they'd consume the same 4 Kafka topics
-  `analytics-service` already does.
 - **Gateway-side JWT enforcement / RBAC** — `identity-service` issues tokens
   today; validating them at the gateway and wiring role-based route access is
   the next security milestone.
