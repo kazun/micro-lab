@@ -13,4 +13,6 @@ patches:
   - path: review-deployment-patch.yaml
   - path: gateway-deployment-patch.yaml
   - path: analytics-deployment-patch.yaml
+  - path: flink-jobmanager-patch.yaml
+  - path: flink-taskmanager-patch.yaml
   - path: secret-patch.yaml

@@ -150,12 +150,53 @@ services:
       - VOTING_SERVICE_URI=http://voting-service:8080
       - REVIEW_SERVICE_URI=http://review-service:8080
       - ANALYTICS_SERVICE_URI=http://analytics-service:8080
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
     depends_on:
       - identity-service
       - product-service
       - voting-service
       - review-service
       - analytics-service
+      - redis
+
+  flink-jobmanager:
+    build:
+      context: ./services
+      dockerfile: fraud-detection-job/Dockerfile
+    container_name: flink-jobmanager
+    command: standalone-job --job-classname com.peap.fraud.FraudDetectionJob
+    # On a fresh stack the api-request topic doesn't exist until the gateway
+    # publishes its first event; the job fails on the missing topic, so both
+    # Flink and the container must retry until the topic appears.
+    restart: on-failure
+    ports:
+      - "8091:8081"
+    environment:
+      - "FLINK_PROPERTIES=jobmanager.rpc.address: flink-jobmanager\nrestart-strategy.type: fixed-delay\nrestart-strategy.fixed-delay.attempts: 30\nrestart-strategy.fixed-delay.delay: 10s"
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      # low threshold so the request-flood rule is easy to trip in a demo
+      - REQUEST_THRESHOLD=20
+      - WINDOW_SECONDS=60
+      - SLIDE_SECONDS=10
+      - BLOCK_TTL_SECONDS=120
+    depends_on:
+      - kafka
+      - redis
+
+  flink-taskmanager:
+    build:
+      context: ./services
+      dockerfile: fraud-detection-job/Dockerfile
+    container_name: flink-taskmanager
+    command: taskmanager
+    environment:
+      - "FLINK_PROPERTIES=jobmanager.rpc.address: flink-jobmanager\ntaskmanager.numberOfTaskSlots: 2"
+    depends_on:
+      - flink-jobmanager
 
 volumes:
   postgres-data:

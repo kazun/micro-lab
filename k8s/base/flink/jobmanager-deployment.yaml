@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-jobmanager
+  labels:
+    app: flink-jobmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink-jobmanager
+  template:
+    metadata:
+      labels:
+        app: flink-jobmanager
+    spec:
+      containers:
+        - name: flink-jobmanager
+          image: peap/fraud-detection-job:latest
+          args: ["standalone-job", "--job-classname", "com.peap.fraud.FraudDetectionJob"]
+          ports:
+            - containerPort: 6123
+            - containerPort: 6124
+            - containerPort: 8081
+          env:
+            # Fixed-delay restarts cover the fresh-stack race where the
+            # api-request topic doesn't exist until the gateway's first
+            # publish; process.size must stay under the container limit.
+            - name: FLINK_PROPERTIES
+              value: |
+                jobmanager.rpc.address: flink-jobmanager
+                jobmanager.memory.process.size: 1024m
+                restart-strategy.type: fixed-delay
+                restart-strategy.fixed-delay.attempts: 30
+                restart-strategy.fixed-delay.delay: 10s
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REQUEST_THRESHOLD
+              value: "30"
+            - name: WINDOW_SECONDS
+              value: "60"
+            - name: SLIDE_SECONDS
+              value: "10"
+            - name: BLOCK_TTL_SECONDS
+              value: "300"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 1280Mi
+            limits:
+              cpu: 500m
+              memory: 1280Mi
+          readinessProbe:
+            httpGet:
+              path: /overview
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /overview
+              port: 8081
+            initialDelaySeconds: 60
+            periodSeconds: 15

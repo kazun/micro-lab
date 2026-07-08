@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-taskmanager
+  labels:
+    app: flink-taskmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink-taskmanager
+  template:
+    metadata:
+      labels:
+        app: flink-taskmanager
+    spec:
+      containers:
+        - name: flink-taskmanager
+          image: peap/fraud-detection-job:latest
+          args: ["taskmanager"]
+          ports:
+            - containerPort: 6122
+          env:
+            # Pin the rpc port so the readiness probe has a fixed target
+            # (Flink picks a random port otherwise).
+            - name: FLINK_PROPERTIES
+              value: |
+                jobmanager.rpc.address: flink-jobmanager
+                taskmanager.rpc.port: 6122
+                taskmanager.memory.process.size: 1024m
+                taskmanager.numberOfTaskSlots: 2
+          resources:
+            requests:
+              cpu: 250m
+              memory: 1280Mi
+            limits:
+              cpu: 500m
+              memory: 1280Mi
+          readinessProbe:
+            tcpSocket:
+              port: 6122
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 6122
+            initialDelaySeconds: 45
+            periodSeconds: 15

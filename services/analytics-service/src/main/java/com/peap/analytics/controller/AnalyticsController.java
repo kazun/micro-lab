@@ -1,5 +1,6 @@
 package com.peap.analytics.controller;
 
+import com.peap.analytics.dto.EndpointStatsResponse;
 import com.peap.analytics.dto.EntitySummaryResponse;
 import com.peap.analytics.dto.PlatformSummaryResponse;
 import com.peap.analytics.service.AnalyticsService;
@@ -40,5 +41,11 @@ public class AnalyticsController {
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "10") int limit) {
         return ResponseEntity.ok(analyticsService.getLeaderboard(category, limit));
+    }
+
+    @GetMapping("/requests")
+    public ResponseEntity<List<EndpointStatsResponse>> getEndpointStats(
+            @RequestParam(defaultValue = "20") int limit) {
+        return ResponseEntity.ok(analyticsService.getEndpointStats(limit));
     }
 }

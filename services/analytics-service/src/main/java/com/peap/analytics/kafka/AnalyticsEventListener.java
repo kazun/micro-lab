@@ -51,6 +51,20 @@ public class AnalyticsEventListener {
         analyticsService.recordReviewSubmitted(uuid(event, "entityId"), instant(event, "submittedAt"));
     }
 
+    /**
+     * Same topic the Flink fraud job consumes, but under this service's own
+     * consumer group - each gets a full copy of the stream.
+     */
+    @KafkaListener(topics = "api-request")
+    public void onApiRequest(Map<String, Object> event) {
+        analyticsService.recordApiRequest(
+                (String) event.get("method"),
+                (String) event.get("path"),
+                ((Number) event.get("status")).intValue(),
+                ((Number) event.get("durationMs")).longValue(),
+                instant(event, "timestamp"));
+    }
+
     private static UUID uuid(Map<String, Object> event, String field) {
         return UUID.fromString((String) event.get(field));
     }

@@ -11,3 +11,4 @@ resources:
   - voting-service
   - review-service
   - analytics-service
+  - flink

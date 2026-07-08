@@ -59,7 +59,7 @@ jobs:
             curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
             sudo mv kustomize /usr/local/bin/
           }
-          for svc in api-gateway identity-service product-service voting-service review-service analytics-service; do
+          for svc in api-gateway identity-service product-service voting-service review-service analytics-service fraud-detection-job; do
             kustomize edit set image "${REGISTRY}/${svc}=${REGISTRY}/${svc}:${{ inputs.tag }}"
           done
 
@@ -68,7 +68,7 @@ jobs:
 
       - name: Wait for rollouts
         run: |
-          for d in postgres redis kafka api-gateway identity-service product-service voting-service review-service analytics-service; do
+          for d in postgres redis kafka api-gateway identity-service product-service voting-service review-service analytics-service flink-jobmanager flink-taskmanager; do
             kubectl -n peap-qa rollout status "deployment/$d" --timeout=300s
           done
 

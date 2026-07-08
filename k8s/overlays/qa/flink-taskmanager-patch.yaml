@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-taskmanager
+spec:
+  template:
+    spec:
+      containers:
+        - name: flink-taskmanager
+          image: us-central1-docker.pkg.dev/peap-lab/peap/fraud-detection-job:v1
+          imagePullPolicy: Always

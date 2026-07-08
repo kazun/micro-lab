@@ -28,6 +28,7 @@
     <module>voting-service</module>
     <module>review-service</module>
     <module>analytics-service</module>
+    <module>fraud-detection-job</module>
   </modules>
 
   <dependencyManagement>

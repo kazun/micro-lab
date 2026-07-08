@@ -45,7 +45,7 @@ jobs:
       - name: Build and push images
         working-directory: services
         run: |
-          for svc in api-gateway identity-service product-service voting-service review-service analytics-service; do
+          for svc in api-gateway identity-service product-service voting-service review-service analytics-service fraud-detection-job; do
             docker build -f "${svc}/Dockerfile" \
               -t "${REGISTRY}/${svc}:${GITHUB_SHA::7}" \
               -t "${REGISTRY}/${svc}:latest" .

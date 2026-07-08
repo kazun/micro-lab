@@ -19,6 +19,9 @@ spec:
           image: peap/api-gateway:latest
           ports:
             - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: api-gateway-config
           resources:
             requests:
               cpu: 100m

@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-jobmanager
+spec:
+  template:
+    spec:
+      containers:
+        - name: flink-jobmanager
+          image: peap/fraud-detection-job:prod

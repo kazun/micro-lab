@@ -1,15 +1,18 @@
 package com.peap.analytics.service;
 
+import com.peap.analytics.dto.EndpointStatsResponse;
 import com.peap.analytics.dto.EntitySummaryResponse;
 import com.peap.analytics.dto.PlatformSummaryResponse;
 import com.peap.analytics.model.EntityStats;
 import com.peap.analytics.model.PlatformCounter;
+import com.peap.analytics.repository.ApiEndpointStatsRepository;
 import com.peap.analytics.repository.EntityStatsRepository;
 import com.peap.analytics.repository.PlatformCounterRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,14 +30,23 @@ public class AnalyticsService {
     private static final String METRIC_ENTITIES_CREATED = "entities_created";
     private static final String METRIC_VOTES_CAST = "votes_cast";
     private static final String METRIC_REVIEWS_SUBMITTED = "reviews_submitted";
+    private static final String METRIC_API_REQUESTS = "api_requests";
+
+    /** Collapses path segments that are UUIDs or numbers into {id}. */
+    private static final Pattern ID_SEGMENT = Pattern.compile(
+            "/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|\\d+)(?=/|$)");
 
     private final EntityStatsRepository entityStatsRepository;
     private final PlatformCounterRepository platformCounterRepository;
+    private final ApiEndpointStatsRepository apiEndpointStatsRepository;
 
     public AnalyticsService(
-            EntityStatsRepository entityStatsRepository, PlatformCounterRepository platformCounterRepository) {
+            EntityStatsRepository entityStatsRepository,
+            PlatformCounterRepository platformCounterRepository,
+            ApiEndpointStatsRepository apiEndpointStatsRepository) {
         this.entityStatsRepository = entityStatsRepository;
         this.platformCounterRepository = platformCounterRepository;
+        this.apiEndpointStatsRepository = apiEndpointStatsRepository;
     }
 
     @Transactional
@@ -60,6 +72,19 @@ public class AnalyticsService {
         incrementCounter(METRIC_REVIEWS_SUBMITTED);
     }
 
+    @Transactional
+    public void recordApiRequest(String method, String path, int status, long durationMs, Instant seenAt) {
+        String endpoint = method + " " + ID_SEGMENT.matcher(path).replaceAll("/{id}");
+        apiEndpointStatsRepository.upsertRequest(endpoint, durationMs, status >= 400 ? 1 : 0, seenAt);
+        incrementCounter(METRIC_API_REQUESTS);
+    }
+
+    public List<EndpointStatsResponse> getEndpointStats(int limit) {
+        return apiEndpointStatsRepository.findTopByRequestCount(PageRequest.of(0, limit)).stream()
+                .map(EndpointStatsResponse::from)
+                .toList();
+    }
+
     public EntitySummaryResponse getEntitySummary(UUID entityId) {
         return entityStatsRepository.findById(entityId)
                 .map(EntitySummaryResponse::from)
@@ -71,7 +96,8 @@ public class AnalyticsService {
                 counterValue(METRIC_USERS_REGISTERED),
                 counterValue(METRIC_ENTITIES_CREATED),
                 counterValue(METRIC_VOTES_CAST),
-                counterValue(METRIC_REVIEWS_SUBMITTED));
+                counterValue(METRIC_REVIEWS_SUBMITTED),
+                counterValue(METRIC_API_REQUESTS));
     }
 
     public List<EntitySummaryResponse> getLeaderboard(String category, int limit) {

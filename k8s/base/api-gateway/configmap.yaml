@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-config
+data:
+  # api-request event publishing + fraud blocklist lookups
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  SPRING_REDIS_HOST: "redis"
+  SPRING_REDIS_PORT: "6379"
